@@ -1,0 +1,31 @@
+.controls {
+  padding: 10px;
+  text-align: center;
+  background: #f9f9f9;
+  border-bottom: 1px solid #ccc;
+}
+
+.controls input {
+  margin: 5px;
+  padding: 8px;
+  width: 200px;
+}
+
+.controls button {
+  margin: 5px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.calculate-button {
+  margin: 10px;
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.error {
+  color: red;
+}
