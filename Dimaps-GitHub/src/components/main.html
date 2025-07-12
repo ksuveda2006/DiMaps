@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Form</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f9fafb;
+        background-image: url("dimaps\src\background.jpg");
+        background-size: cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .header {
+        background-color: #000000;
+        color: #ffffff;
+        width: 100%;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        z-index: 10;
+      }
+      .header span {
+        font-weight: bold;
+      }
+      .header a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        max-width: 450px;
+        width: 90%;
+        margin-top: 120px; /* Added margin to adjust for header */
+      }
+      .hidden {
+        display: none;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #1f2937;
+        font-weight: 600;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      }
+      .btn {
+        background-color: #3b82f6;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+        width: 100%;
+      }
+      .btn:hover {
+        background-color: #2563eb;
+      }
+      .footer {
+        background-color: #000000;
+        color: #ffffff;
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        bottom: 0;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <div class="header">
+      <span>DiMaps.in</span>
+      <span><a href="http://localhost:3000/">Login as Guest</a></span>
+    </div>
+
+    <!-- Accessible Disability Form -->
+    <div class="container hidden" id="accessibleForm">
+      <h2 style="text-align: center">Accessible Disability Form</h2>
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter your name" />
+      </div>
+      <div class="form-group">
+        <label for="disabilities">Disability:</label>
+        <input
+          type="text"
+          id="disabilities"
+          placeholder="Enter your disability"
+        />
+      </div>
+      <button class="btn" onclick="submitForm()">Go to map</button>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">© 2024 DiMaps. All rights reserved.</div>
+
+    <script>
+      // Speech Synthesis (Text-to-Speech)
+      const synth = window.speechSynthesis;
+
+      // Speech Recognition
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+
+      // Text-to-Speech Function
+      function speak(text, callback) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = callback;
+        synth.speak(utterance);
+      }
+
+      // Automatically ask if the user is blind when the page loads
+      window.onload = function () {
+        setTimeout(() => {
+          askAreYouBlind();
+        }, 500);
+      };
+
+      // Ask if the user is blind
+      function askAreYouBlind() {
+        speak(
+          "Are you blind? Please say yes or no after the beep.",
+          listenForResponse
+        );
+      }
+
+      // Listen for user response
+      function listenForResponse() {
+        recognition.start();
+        recognition.onresult = (event) => {
+          const answer = event.results[0][0].transcript.toLowerCase();
+          if (answer.includes("yes")) {
+            speak(
+              "Redirecting you to the map with your location.",
+              () => (href = "http://localhost:3000/")
+            );
+          } else if (answer.includes("no")) {
+            speak(
+              "Please fill out the accessible form that appears on your screen."
+            );
+            showAccessibleForm();
+          } else {
+            speak(
+              "I didn't catch that. Please say yes or no.",
+              listenForResponse
+            );
+          }
+        };
+      }
+
+      // Show the Accessible Disability Form
+      function showAccessibleForm() {
+        const accessibleForm = document.getElementById("accessibleForm");
+        accessibleForm.classList.remove("hidden");
+      }
+
+      // Form Submission and Redirect to Login
+      function submitForm() {
+        const name = document.getElementById("name").value.trim();
+        const disabilities = document
+          .getElementById("disabilities")
+          .value.trim();
+
+        if (!name || !disabilities) {
+          speak(
+            "Please fill in both your name and your disability before submitting."
+          );
+          return;
+        }
+
+        // Save data to localStorage
+        localStorage.setItem(
+          "userData",
+          JSON.stringify({ name, disabilities })
+        );
+
+        // Redirect to React Map Component
+        alert(
+          `Form submitted successfully!\nName: ${name}\nDisability: ${disabilities}`
+        );
+        speak(
+          "Form submitted successfully. Redirecting to the map page.",
+          () => (href = "http://localhost:3000/") // Change this to the page where React Map is rendered
+        );
+      }
+    </script>
+  </body>
+</html>
